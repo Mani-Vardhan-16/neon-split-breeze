@@ -1,13 +1,67 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import AuthPage from '@/components/AuthPage';
+import Dashboard from '@/components/Dashboard';
+import GroupPage from '@/components/GroupPage';
+
+interface User {
+  name: string;
+  email: string;
+  id: string;
+}
+
+interface Group {
+  id: string;
+  name: string;
+  totalSpent: number;
+  members: number;
+  yourBalance: number;
+  lastActivity: string;
+  color: string;
+}
 
 const Index = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+
+  const handleAuth = (userData: User) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setSelectedGroup(null);
+  };
+
+  const handleGroupSelect = (group: Group) => {
+    setSelectedGroup(group);
+  };
+
+  const handleBackToDashboard = () => {
+    setSelectedGroup(null);
+  };
+
+  // Show authentication page if user is not logged in
+  if (!user) {
+    return <AuthPage onAuth={handleAuth} />;
+  }
+
+  // Show group page if a group is selected
+  if (selectedGroup) {
+    return (
+      <GroupPage 
+        group={selectedGroup} 
+        onBack={handleBackToDashboard} 
+      />
+    );
+  }
+
+  // Show dashboard as the main page
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <Dashboard 
+      user={user} 
+      onLogout={handleLogout}
+      onGroupSelect={handleGroupSelect}
+    />
   );
 };
 
