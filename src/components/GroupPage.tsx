@@ -250,11 +250,19 @@ const GroupPage = ({ group, onBack }: { group: Group; onBack: () => void }) => {
               </Button>
             </div>
 
-            <div className="grid gap-4">
-              {balances.map((balance, index) => (
-                <Card key={index} className="glass-card">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
+            {/* What's owed to you */}
+            <Card className="glass-card border-success/30">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg text-success flex items-center gap-2">
+                  <DollarSign className="w-5 h-5" />
+                  Money Owed to You
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {balances
+                  .filter(balance => balance.to === 'Alex Chen') // Current user
+                  .map((balance, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-success/5 rounded-lg border border-success/20">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="text-xs">
@@ -262,7 +270,34 @@ const GroupPage = ({ group, onBack }: { group: Group; onBack: () => void }) => {
                           </AvatarFallback>
                         </Avatar>
                         <span className="font-medium">{balance.from}</span>
-                        <span className="text-muted-foreground">owes</span>
+                        <span className="text-muted-foreground">owes you</span>
+                      </div>
+                      <Badge variant="default" className="text-lg font-bold bg-success text-success-foreground">
+                        +₹{balance.amount.toLocaleString()}
+                      </Badge>
+                    </div>
+                  ))}
+                {balances.filter(balance => balance.to === 'Alex Chen').length === 0 && (
+                  <p className="text-muted-foreground text-center py-4">No one owes you money in this group</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* What you owe */}
+            <Card className="glass-card border-destructive/30">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg text-destructive flex items-center gap-2">
+                  <CreditCard className="w-5 h-5" />
+                  Money You Owe
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {balances
+                  .filter(balance => balance.from === 'Alex Chen') // Current user
+                  .map((balance, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-destructive/5 rounded-lg border border-destructive/20">
+                      <div className="flex items-center gap-3">
+                        <span className="text-muted-foreground">You owe</span>
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="text-xs">
                             {balance.to.split(' ').map(n => n[0]).join('')}
@@ -271,13 +306,46 @@ const GroupPage = ({ group, onBack }: { group: Group; onBack: () => void }) => {
                         <span className="font-medium">{balance.to}</span>
                       </div>
                       <Badge variant="destructive" className="text-lg font-bold">
-                        ₹{balance.amount.toLocaleString()}
+                        -₹{balance.amount.toLocaleString()}
                       </Badge>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  ))}
+                {balances.filter(balance => balance.from === 'Alex Chen').length === 0 && (
+                  <p className="text-muted-foreground text-center py-4">You don't owe anyone in this group</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* All group balances */}
+            <Card className="glass-card">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">All Group Balances</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {balances.map((balance, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="text-xs">
+                          {balance.from.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{balance.from}</span>
+                      <span className="text-muted-foreground">owes</span>
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="text-xs">
+                          {balance.to.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{balance.to}</span>
+                    </div>
+                    <Badge variant="outline" className="font-bold">
+                      ₹{balance.amount.toLocaleString()}
+                    </Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="members" className="space-y-4">
